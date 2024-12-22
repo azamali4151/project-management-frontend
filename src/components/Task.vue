@@ -12,21 +12,21 @@
       <!-- Side Menu Bar -->
       <aside class="sidebar">
         <ul>
-          <li><router-link to="/dashboard">Dashboard</router-link></li>  <!-- Dashboard link -->
-          <li><router-link to="/project">Project</router-link></li>  <!-- Project link -->
-          <li><router-link to="/task">Task</router-link></li>  <!-- Task link -->
+          <li><router-link to="/dashboard">Dashboard</router-link></li>
+          <li><router-link to="/project">Project</router-link></li>
+          <li><router-link to="/task">Task</router-link></li>
         </ul>
       </aside>
 
       <!-- Main Content -->
       <main class="content">
         <h2>Task List</h2>
-        <!-- Add Project Button -->
+        <!-- Add Task Button -->
         <button class="btn btn-primary mb-3" @click="showModal">
           <i class="bi bi-plus-circle"></i> Add Task
         </button>
 
-        <!-- Bootstrap Table for Task List -->
+        <!-- Task List Table -->
         <div class="table-responsive">
           <table class="table table-striped table-bordered">
             <thead>
@@ -49,22 +49,112 @@
                 <td>{{ task.dueDate }}</td>
                 <td>{{ task.status }}</td>
                 <td>
-                <button
-                  class="btn btn-info btn-sm"
-                  @click="editProject(project)"
-                >
-                  <i class="bi bi-pencil-square"></i>
-                </button>
-                <button
-                  class="btn btn-danger btn-sm"
-                  @click="deleteProject(project)"
-                >
-                  <i class="bi bi-trash"></i>
-                </button>
-              </td>
+                  <button class="btn btn-info btn-sm" @click="editTask(task)">
+                    <i class="bi bi-pencil-square"></i>
+                  </button>
+                  <button class="btn btn-danger btn-sm" @click="deleteTask(task)">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </td>
               </tr>
             </tbody>
           </table>
+        </div>
+
+        <!-- Add/Edit Task Modal -->
+        <div class="modal" tabindex="-1" :class="{ 'd-block': isModalOpen }" @click="closeModal">
+          <div class="modal-dialog" @click.stop>
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Add Task</h5>
+                <button type="button" class="btn-close" @click="closeModal">
+                  <span class="close-icon">&#10006;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <form @submit.prevent="addTask()">
+                  <!-- Task Title -->
+                  <div class="mb-3">
+                    <label for="title" class="form-label">Task Title</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="title"
+                      v-model="taskForm.title"
+                      required
+                    />
+                  </div>
+                  <!-- Task Description -->
+                  <div class="mb-3">
+                    <label for="description" class="form-label">Description</label>
+                    <textarea
+                      class="form-control"
+                      id="description"
+                      rows="3"
+                      v-model="taskForm.description"
+                      required
+                    ></textarea>
+                  </div>
+                  <!-- Project Select Box -->
+                  <div class="mb-3">
+                    <label for="project" class="form-label">Project</label>
+                    <select
+                      class="form-select"
+                      id="project"
+                      v-model="taskForm.project"
+                      required
+                    >
+                      <option v-for="project in projects" :key="project.id" :value="project.id">
+                        {{ project.title }}
+                      </option>
+                    </select>
+                  </div>
+                  <!-- Priority -->
+                  <div class="mb-3">
+                    <label for="priority" class="form-label">Priority</label>
+                    <select
+                      class="form-select"
+                      id="priority"
+                      v-model="taskForm.priority"
+                      required
+                    >
+                      <option value="High">High</option>
+                      <option value="Medium">Medium</option>
+                      <option value="Low">Low</option>
+                    </select>
+                  </div>
+                  <!-- Due Date -->
+                  <div class="mb-3">
+                    <label for="dueDate" class="form-label">Due Date</label>
+                    <input
+                      type="date"
+                      class="form-control"
+                      id="dueDate"
+                      v-model="taskForm.dueDate"
+                      required
+                    />
+                  </div>
+                  <!-- Status -->
+                  <div class="mb-3">
+                    <label for="status" class="form-label">Status</label>
+                    <select
+                      class="form-select"
+                      id="status"
+                      v-model="taskForm.status"
+                      required
+                    >
+                      <option value="Pending">Pending</option>
+                      <option value="In Progress">In Progress</option>
+                      <option value="Completed">Completed</option>
+                    </select>
+                  </div>
+                   <button type="submit" class="btn btn-primary">
+                   Add Task
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
         </div>
       </main>
     </div>
@@ -72,11 +162,25 @@
 </template>
 
 <script>
+import axiosInstance from '../axiosInstance';
+
 export default {
-  name: "Task",
   data() {
     return {
-      tasks: [
+      isModalOpen: false,
+      isEditing: false,
+      projects: [],
+      tasks: [],
+      taskForm: {
+        id: null,
+        title: "",
+        description: "",
+        project: "",
+        priority: "",
+        dueDate: "",
+        status: "",
+      },
+       tasks: [
         { id: 1, title: "Task 1", description: "Description for Task 1", project: "Project A", priority: "High", dueDate: "2024-12-25", status: "Pending" },
         { id: 2, title: "Task 2", description: "Description for Task 2", project: "Project B", priority: "Medium", dueDate: "2024-12-26", status: "In Progress" },
         { id: 3, title: "Task 3", description: "Description for Task 3", project: "Project C", priority: "Low", dueDate: "2024-12-27", status: "Completed" },
@@ -85,9 +189,26 @@ export default {
     };
   },
   methods: {
-    logout() {
-      alert("Logging out...");
-      this.$router.push("/");
+    async fetchProjects() {
+      try {
+        const response = await axiosInstance.get('/projects');
+        this.projects = response.data;
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+      }
+    },
+    showModal(task = null) {
+      this.isModalOpen = true;
+      if (task) {
+        this.isEditing = true;
+        this.taskForm = { ...task };
+      } else {
+        this.isEditing = false;
+        this.resetTaskForm();
+      }
+    },
+    closeModal() {
+      this.isModalOpen = false;
     },
     onDragStart(event, task) {
       this.draggedTask = task;
@@ -103,10 +224,38 @@ export default {
         const droppedIndex = this.tasks.findIndex(t => t.id === task.id);
         this.tasks.splice(droppedIndex, 0, this.tasks.splice(draggedIndex, 1)[0]);
       }
-    }
+    },
+    addTask() {
+      const newTask = { ...this.taskForm, id: Date.now() };
+      this.tasks.push(newTask);
+      this.closeModal();
+    },
+    updateTask() {
+      const index = this.tasks.findIndex((task) => task.id === this.taskForm.id);
+      if (index !== -1) {
+        this.tasks.splice(index, 1, this.taskForm);
+      }
+      this.closeModal();
+    },
+    resetTaskForm() {
+      this.taskForm = {
+        id: null,
+        title: "",
+        description: "",
+        project: "",
+        priority: "",
+        dueDate: "",
+        status: "",
+      };
+    },
+  },
+  created() {
+    this.fetchProjects();
   },
 };
 </script>
+
+
 
 <style scoped>
 /* General styling for the dashboard layout */
@@ -212,5 +361,46 @@ export default {
 
 .table-bordered th, .table-bordered td {
   border: 1px solid #ddd;
+}
+/* Modal Styling */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal .modal-dialog {
+  position: relative;
+  margin: auto;
+  top: 10%;
+  width: 80%;
+}
+
+.modal .modal-content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 5px;
+}
+
+.modal .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal .modal-header .btn-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+.close-icon{
+    color:black;
 }
 </style>
