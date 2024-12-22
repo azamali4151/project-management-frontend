@@ -75,7 +75,7 @@ export default {
 
 .language-switcher select {
   border: none;
-  background-color: #f0f0f0; /* Change background color to your choice */
+  background-color:rgb(49, 44, 44); /* Change background color to your choice */
   padding: 5px;
   border-radius: 5px;
   cursor: pointer;
@@ -83,7 +83,7 @@ export default {
 
 .language-switcher select:focus {
   outline: none;
-  background-color: #dcdcdc; /* Slightly different background color on focus */
+   background-color:rgb(49, 44, 44); /* Change background color to your choice */
 }
 
 .logout-btn {
