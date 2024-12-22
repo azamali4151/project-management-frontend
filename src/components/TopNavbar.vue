@@ -2,14 +2,17 @@
 <template>
   <nav class="navbar">
     <div class="navbar-content">
-      <h1 class="navbar-title">{{ $t('dashboard') }}</h1>
-      <div class="language-switcher">
-        <label for="language">Language: </label>
-        <select id="language" v-model="selectedLanguage" @change="changeLanguage">
-          <option value="en">English</option>
-          <option value="bn">বাংলা</option>
-        </select>
+      <div class="left-content">
+        <h1 class="navbar-title">{{ $t('dashboard') }}</h1>
+        <div class="language-switcher">
+          <label for="language">Language: </label>
+          <select id="language" v-model="selectedLanguage" @change="changeLanguage">
+            <option value="en">English</option>
+            <option value="bn">বাংলা</option>
+          </select>
+        </div>
       </div>
+      <!-- Logout Button aligned to the right -->
       <button class="logout-btn" @click="logout">{{ $t('logout') }}</button>
     </div>
   </nav>
@@ -45,6 +48,19 @@ export default {
   align-items: center;
 }
 
+.navbar-content {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.left-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .navbar-title {
   margin: 0;
   font-size: 20px;
@@ -59,10 +75,15 @@ export default {
 
 .language-switcher select {
   border: none;
-  background-color: white;
+  background-color: #f0f0f0; /* Change background color to your choice */
   padding: 5px;
   border-radius: 5px;
   cursor: pointer;
+}
+
+.language-switcher select:focus {
+  outline: none;
+  background-color: #dcdcdc; /* Slightly different background color on focus */
 }
 
 .logout-btn {
