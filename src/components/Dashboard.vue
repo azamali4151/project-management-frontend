@@ -3,26 +3,33 @@
     <!-- Top Navigation Bar -->
     <nav class="navbar">
       <div class="navbar-content">
-        <h1 class="navbar-title">Dashboard</h1>
-        <button class="logout-btn" @click="logout">Logout</button>
+        <h1 class="navbar-title">{{ $t('dashboard') }}</h1>
+        <div class="language-switcher">
+          <label for="language">Language: </label>
+          <select id="language" v-model="selectedLanguage" @change="changeLanguage">
+            <option value="en">English</option>
+            <option value="bn">বাংলা</option>
+          </select>
+        </div>
+        <button class="logout-btn" @click="logout">{{ $t('logout') }}</button>
       </div>
     </nav>
 
     <div class="main-container">
       <!-- Side Menu Bar -->
       <aside class="sidebar">
-         <ul>
-          <li><router-link to="/dashboard">Dashboard</router-link></li>  <!-- Dashboard link -->
-          <li><router-link to="/project">Project</router-link></li>  <!-- Project link -->
-          <li><router-link to="/task">Task</router-link></li>  <!-- Project link -->
+        <ul>
+          <li><router-link to="/dashboard">{{ $t('dashboard') }}</router-link></li>
+          <li><router-link to="/project">{{ $t('project') }}</router-link></li>
+          <li><router-link to="/task">{{ $t('task') }}</router-link></li>
         </ul>
       </aside>
 
       <!-- Main Content -->
       <main class="content">
-        <h2>Welcome to the Dashboard</h2>
-        <p>This is the main content area where you can display additional components or information.</p>
-        <p>You can add charts, tables, or any relevant data here.</p>
+        <h2>{{ $t('welcome') }}</h2>
+        <p>{{ $t('content') }}</p>
+        <p>{{ $t('charts') }}</p>
       </main>
     </div>
   </div>
@@ -31,10 +38,18 @@
 <script>
 export default {
   name: "Dashboard",
+  data() {
+    return {
+      selectedLanguage: 'en', // Default language initialized
+    };
+  },
   methods: {
     logout() {
-      alert("Logging out...");
+      alert(this.$t('logout'));
       this.$router.push("/");
+    },
+    changeLanguage() {
+      this.$i18n.locale = this.selectedLanguage;
     },
   },
 };
@@ -55,7 +70,7 @@ export default {
 .navbar {
   background-color: #007bff;
   color: white;
-  padding: 8px 15px; /* Reduced padding for a smaller top bar */
+  padding: 8px 15px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -63,30 +78,36 @@ export default {
 
 .navbar-title {
   margin: 0;
-  font-size: 20px; /* Smaller font size */
+  font-size: 20px;
 }
 
-.navbar-content {
-  display: flex;          /* Enable flexbox layout */
-  justify-content: space-between; /* Push the title to the left and the button to the right */
-  width: 100%;            /* Ensure the content stretches across the navbar */
+.language-switcher {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: white;
+}
+
+.language-switcher select {
+  border: none;
+  background-color: white;
+  padding: 5px;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
 .logout-btn {
   background-color: white;
   color: #007bff;
   border: none;
-  padding: 6px 10px;      /* Reduced padding for smaller button */
+  padding: 6px 10px;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 14px;
-  /* No need for additional positioning styles here, since Flexbox will handle alignment */
 }
 
 .logout-btn:hover {
   background-color: #e6e6e6;
 }
-
 
 /* Main container */
 .main-container {
@@ -100,7 +121,7 @@ export default {
   background-color: #333;
   color: white;
   padding: 15px;
-  height: calc(100vh - 50px); /* Subtract the navbar height */
+  height: calc(100vh - 50px);
   overflow-y: auto;
 }
 
