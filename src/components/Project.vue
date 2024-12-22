@@ -1,22 +1,11 @@
 <template>
   <div class="dashboard">
-    <!-- Top Navigation Bar -->
-    <nav class="navbar">
-      <div class="navbar-content">
-        <h1 class="navbar-title">Project</h1>
-        <button class="logout-btn" @click="logout">Logout</button>
-      </div>
-    </nav>
+      <!-- Use the TopNavbar component -->
+    <TopNavbar />
 
     <div class="main-container">
-      <!-- Side Menu Bar -->
-      <aside class="sidebar">
-        <ul>
-          <li><router-link to="/dashboard">Dashboard</router-link></li>
-          <li><router-link to="/project">Project</router-link></li>
-          <li><router-link to="/task">Task</router-link></li>
-        </ul>
-      </aside>
+      <!-- Use the SideNavbar component -->
+      <SideNavbar />
 
       <!-- Main Content -->
       <main class="content">
@@ -182,9 +171,15 @@
 
 <script>
 import axiosInstance from '../axiosInstance';
+import TopNavbar from './TopNavbar.vue'; 
+import SideNavbar from './SideNavbar.vue';
 
 export default {
   name: "Project",
+   components: {
+    TopNavbar,
+    SideNavbar,
+  },
   data() {
     return {
       isModalOpen: false,
